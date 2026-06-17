@@ -21,6 +21,19 @@ from .routers import (
 # Create all tables on startup
 create_tables()
 
+# Auto-seed database if empty
+from .database import SessionLocal
+from .models import User
+db = SessionLocal()
+try:
+    if db.query(User).count() == 0:
+        print("[STARTUP] Database is empty, auto-seeding demo data...")
+        SeedService.seed_all_data(db)
+except Exception as e:
+    print(f"[STARTUP] Auto-seeding failed: {e}")
+finally:
+    db.close()
+
 app = FastAPI(
     title="AI Job Board API",
     description="AI-powered job board with candidate matching",
